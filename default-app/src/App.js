@@ -9,29 +9,55 @@ class App extends Component {
     super();
 
     this.state = {
-      name: {firstname: 'Issa', lastname: 'Issa'},
-      company: 'The Bernard Group'
+      monsters: [],
+      searchField: ''
     }
+
+    console.log('Constructor')
   }
 
+  componentDidMount() {
+    fetch('https://jsonplaceholder.typicode.com/users')
+      .then(response => response.json())
+      .then((users => this.setState(() => {
+        return {monsters: users}
+      },
+      () => {
+        console.log(this.state)
+      }
+      )
+      ))
+    console.log('Component Did Mount')
+  }
+
+
   render() {
+    console.log('Render')
+
+    const filteredMonster = this.state.monsters.filter((monster) => {
+      return monster.name.toLocaleLowerCase().includes(this.state.searchField);
+    })
+
     return (
       <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Hello {this.state.name.firstname} {this.state.name.lastname}. And I work with {this.state.company}
-          </p>
-          <button onClick={ () => {
-            this.setState(() => {
-              return {
-                name: {firstname: 'Andrew', lastname: 'Xiong'}
-              }
-            }, () => {})
-          }}>
-              Change Name
-            </button>
-        </header>
+        <input className="search-box" type="search" placeholder="Search Monster..." onChange={(event) => {
+          console.log(event.target.value);
+          const searchField = event.target.value.toLocaleLowerCase();
+
+          this.setState(
+            () => {
+              return { searchField };
+          })
+        }}/>
+        {
+          filteredMonster.map( (monster) => {
+            return <div key={monster.id}>
+              <h1>
+                { monster.name }
+              </h1>
+            </div>
+          })
+        }
       </div>
     );
   }
